@@ -1,8 +1,12 @@
 #' Ridge Regression
 #'
-#' @field formula formula. 
-#' @field data data.frame. 
-#' @field lambda numeric. 
+#' @title ridgereg
+#' 
+#' @description ridgereg A ridge regression function
+#'
+#' @param name description formula formula. 
+#' @param data data.frame. 
+#' @param lambda numeric. 
 #' @field x_matrix matrix. 
 #' @field normalized_x_matrix matrix. 
 #' @field y_matrix matrix. 
@@ -10,10 +14,11 @@
 #' @field prediction matrix. 
 #' @field data_name character. 
 #'
-#' @return
-#' @export
+#' @return a ridgreg object
+#' @export 
 #'
-#' @examples
+#' @importFrom methods new
+
 ridgereg <- setRefClass('ridgereg',
                         fields = list(formula = 'formula',
                                       data = 'data.frame',
@@ -74,7 +79,11 @@ ridgereg <- setRefClass('ridgereg',
                         )
 )
 
-ridgereg_model <- ridgereg$new(Petal.Length~Species, iris, 0.001)
-ridgereg_model$beta_ridge
-ridgereg_model$prediction[1:10]
-print.default(ridgereg_model)
+#ridgereg_model <- ridgereg$new(Petal.Length~Species, iris, 0.001)
+#correct_model <- lm.ridge(Petal.Length~Species, iris)
+
+#$coef()
+#coef(correct_model)
+
+
+#print.default(ridgereg_model)

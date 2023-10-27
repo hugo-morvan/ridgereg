@@ -4,7 +4,7 @@ author: "Simge Cinar & Hugo Morvan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Flight Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,12 +16,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r}
+```{r library}
 library(ridgereg)
 ```
 
-```{r}
-ridgereg_model <- ridgereg$new(Petal.Length~Species, iris, 0.001)
+```{r example}
+library(ridgereg)
+ridgereg_model <- ridgereg:::ridgereg$new(Petal.Length~Species, iris, 0.001)
 ridgereg_model$beta_ridge
 ```
 

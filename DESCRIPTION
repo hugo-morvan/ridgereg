@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2023-10-27
 Author: Simge Cinar, Hugo Morvan
 Maintainer: Simge Cinar <simci637@student.liu.se>, Hugo Morvan <hugmo418@student.liu.se>
-Description: More about what it does (maybe more than one line)
+Description: This package contains an implementation of a Ridge Regression that copies the functionalities of the MASS::lm.ridge() function.
 License: Apache License (== 2.0) | file LICENSE
 Suggests: 
     knitr,
@@ -13,11 +13,12 @@ Suggests:
     testthat (>= 3.0.0)
 Imports:
     ggplot2,
-    shiny,
-    jsonlite,
-    dplyr
+    dplyr,
+    MASS,
+    methods
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 Depends: 
     R (>= 3.5.0)
+RoxygenNote: 7.2.3
