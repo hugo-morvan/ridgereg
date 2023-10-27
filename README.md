@@ -4,6 +4,13 @@
   
 # Ridge Regression - Bonus Lab
 
+
+## Authors
+
+- [@hugo-morvan](https://www.github.com/hugo-morvan)
+- [@simgeecnr](https://www.github.com/simgeecnr)
+
+
 ## Installation
 
 To install and use this package, you can follow these steps:
