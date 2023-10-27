@@ -1,12 +1,23 @@
 Package: ridgereg
 Type: Package
-Title: What the package does (short line)
+Title: This package contains an implementation of a Ridge Regression model
 Version: 1.0
 Date: 2023-10-27
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: Simge Cinar, Hugo Morvan
+Maintainer: Simge Cinar <simci637@student.liu.se>, Hugo Morvan <hugmo418@student.liu.se>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: Apache License (== 2.0) | file LICENSE
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
+Imports:
+    ggplot2,
+    shiny,
+    jsonlite,
+    dplyr
 Config/testthat/edition: 3
+VignetteBuilder: knitr
+VignetteEngine: knitr::rmarkdown
+Depends: 
+    R (>= 3.5.0)
