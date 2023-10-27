@@ -20,3 +20,8 @@ knitr::opts_chunk$set(
 library(ridgereg)
 ```
 
+```{r}
+ridgereg_model <- ridgereg$new(Petal.Length~Species, iris, 0.001)
+ridgereg_model$beta_ridge
+```
+
