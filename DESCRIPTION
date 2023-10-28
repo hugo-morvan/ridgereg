@@ -17,6 +17,7 @@ Imports:
     dplyr,
     MASS,
     caret,
+    lattice,
     methods
 Config/testthat/edition: 3
 VignetteBuilder: knitr
