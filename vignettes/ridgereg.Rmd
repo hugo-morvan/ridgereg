@@ -63,3 +63,19 @@ forward_model <- MASS::stepAIC(nullModel, # start with a model containing no var
 
 cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((forward_model$residuals)^2)))
 ```
+
+### 4) Fit a ridge regression model to the training dataset for different values of λ.
+```{r}
+# KEEP
+# Model3: Ridge regression with full model using different lambda values
+formula <- medv ~ .
+data <- training_data
+lambda <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
+train_matrix <- model.matrix(formula,training_data)
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  res <- ridgereg_model$predict(train_matrix) - training_data[,14]
+  cat("Lambda:", l, "\n")
+  cat("Mean Square Error (MSE):", (1/nrow(training_data))*sum(res^2), "\n")
+}
+```
