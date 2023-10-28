@@ -1,0 +1,156 @@
+---
+title: "Ridge Regression Vignette"
+author: "Simge Cinar & Hugo Morvan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ridge Regression Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r library}
+library(ridgereg)
+```
+
+#QUESTION 1.2
+
+### 1): Create a 70-30 train-test split
+```{r}
+# KEEP
+data(BostonHousing, package = "mlbench")
+set.seed(123)
+splitIndex <- caret::createDataPartition(BostonHousing$medv, p = 0.7, list = FALSE)
+training_data <- BostonHousing[splitIndex, ]
+test_data <- BostonHousing[-splitIndex, ]
+# Convert columns to numeric
+training_data <- as.data.frame(lapply(training_data, as.numeric))
+test_data <- as.data.frame(lapply(test_data, as.numeric))
+```
+
+### 2,3) Fit a linear regression model and a fit a linear regression model with forward selection of covariates on the training dataset.
+```{r}
+# KEEP
+# Model1: Full model with the linear regression
+mod1 <- lm(medv ~ ., data=training_data)
+cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((mod1$residuals)^2)))
+```
+
+```{r}
+#KEEP
+# Model2: Model with forward selection
+# Selects the model with the lowest AIC
+fullModel <- lm(medv ~ ., data=training_data)
+nullModel <- lm(medv ~ 1, data=training_data)
+forward_model <- MASS::stepAIC(nullModel, # start with a model containing no variables
+                direction = 'forward', # run forward selection
+                scope = list(upper = fullModel, 
+                             lower = nullModel), 
+                trace = 0) # do not show the step-by-step process of model selection
+
+
+cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((forward_model$residuals)^2)))
+```
+
+### 4) Fit a ridge regression model to the training dataset for different values of λ.
+
+```{r}
+# KEEP
+# Model3: Ridge regression with full model using different lambda values
+formula <- medv ~ .
+data <- training_data
+lambda <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
+train_matrix <- model.matrix(formula, training_data)
+
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  res <- ridgereg_model$predict(train_matrix) - training_data[,14]
+  cat("Lambda:", l, "\n")
+  cat("Mean Square Error (MSE):", (1/nrow(training_data))*sum(res^2), "\n")
+}
+```
+
+### 5) Find the best hyperparameter value for λ using 10-fold cross-validation on the training set.
+```{r}
+ctrl <- caret::trainControl(method = "cv", number = 10)
+
+your_lambda_values <- 10^seq(10, -2, length = 100)
+#your_lambda_values <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
+X <- training_data[,1:13]
+Y <- training_data[,14]
+ridgeGrid <- expand.grid(alpha = 0, lambda = your_lambda_values)
+ridgeModel <- caret::train(X, Y, method = "glmnet", trControl = ctrl, tuneGrid = ridgeGrid)
+bestLambda <- ridgeModel$bestTune$lambda
+cat("\nBest lambda:", bestLambda)
+```
+
+```{r}
+plot(ridgeModel)
+```
+
+
+### 6) Evaluate the performance of all three models on the test dataset
+```{r}
+# Model1: Linear regression with full model
+pred_mod1<- predict(mod1, newdata = test_data)
+res <- pred_mod1 - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+```{r}
+# Model2: Linear regression with forward selection
+pred_forward_model<- predict(forward_model, newdata = test_data)
+res <- pred_forward_model - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+
+```{r}
+# Model3: Ridge regression with full model
+formula <- medv ~ .
+data <- training_data
+lambda <- 0.4977024
+
+ridgereg_model <- ridgereg:::ridgereg$new(formula, data, lambda)
+test_matrix <- model.matrix(formula,test_data)
+pred <- ridgereg_model$predict(test_matrix)
+res <- pred - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+### Conclusion: 
+
+
+
+
+
+
+
+
+
+
