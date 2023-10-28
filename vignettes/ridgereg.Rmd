@@ -26,7 +26,7 @@ ridgereg_model <- ridgereg:::ridgereg$new(Petal.Length~Species, iris, 0.001)
 ridgereg_model$beta_ridge
 ```
 
-#QUESTION 1.2
+# QUESTION 1.2
 
 ### 1): Create a 70-30 train-test split
 ```{r}
@@ -83,23 +83,6 @@ for (l in lambda){
 
 ### 5) Find the best hyperparameter value for λ using 10-fold cross-validation on the training set.
 
-```{r}
-# Load and prepare your training data (X_train and y_train)
-X_train <- training_data[,1:13]
-y_train <- training_data[,14]
-# Define a range of λ values to test
-lambda_values <- 10^seq(-6, 6, by = 0.1)  # Adjust the range as needed
-
-# Create a training control object for cross-validation
-ctrl <- caret::trainControl(method = "cv", number = 10)
-
-# Perform cross-validation to find the best lambda
-ridge_model <- caret::train(x = X_train, y = y_train, method = "glmnet", trControl = ctrl, tuneGrid = expand.grid(lambda = lambda_values, alpha = 0))
-
-# Access the results
-best_lambda <- ridge_model$bestTune$lambda
-cat("\nBest Lambda:", best_lambda, "\n")
-```
 
 
 
