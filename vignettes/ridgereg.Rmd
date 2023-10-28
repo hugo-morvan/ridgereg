@@ -79,3 +79,78 @@ for (l in lambda){
   cat("Mean Square Error (MSE):", (1/nrow(training_data))*sum(res^2), "\n")
 }
 ```
+
+
+### 5) Find the best hyperparameter value for λ using 10-fold cross-validation on the training set.
+```{r}
+ctrl <- caret::trainControl(method = "cv", number = 10)
+
+your_lambda_values <- 10^seq(10, -2, length = 100)
+#your_lambda_values <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
+X <- training_data[,1:13]
+Y <- training_data[,14]
+ridgeGrid <- expand.grid(alpha = 0, lambda = your_lambda_values)
+ridgeModel <- caret::train(X, Y, method = "glmnet", trControl = ctrl, tuneGrid = ridgeGrid)
+bestLambda <- ridgeModel$bestTune$lambda
+cat("\nBest lambda:", bestLambda)
+```
+
+```{r}
+plot(ridgeModel)
+```
+
+### 6) Evaluate the performance of all three models on the test dataset
+```{r}
+# Model1: Linear regression with full model
+pred_mod1<- predict(mod1, newdata = test_data)
+res <- pred_mod1 - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+```{r}
+# Model2: Linear regression with forward selection
+pred_forward_model<- predict(forward_model, newdata = test_data)
+res <- pred_forward_model - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+
+```{r}
+# Model3: Ridge regression with full model
+formula <- medv ~ .
+data <- training_data
+lambda <- 0.4977024
+
+ridgereg_model <- ridgereg:::ridgereg$new(formula, data, lambda)
+test_matrix <- model.matrix(formula,test_data)
+pred <- ridgereg_model$predict(test_matrix)
+res <- pred - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+### Conclusion: 
+
+
+
+
+
+
+
