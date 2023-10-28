@@ -54,7 +54,7 @@ cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((mod1$residuals)^2))
 # Selects the model with the lowest AIC
 fullModel <- lm(medv ~ ., data=training_data)
 nullModel <- lm(medv ~ 1, data=training_data)
-forward_model <- stepAIC(nullModel, # start with a model containing no variables
+forward_model <- MASS::stepAIC(nullModel, # start with a model containing no variables
                 direction = 'forward', # run forward selection
                 scope = list(upper = fullModel, 
                              lower = nullModel), 
