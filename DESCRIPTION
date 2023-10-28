@@ -16,10 +16,6 @@ Imports:
     ggplot2,
     dplyr,
     MASS,
-    nycflights13,
-    mlbench,
-    caret,
-    lattice,
     methods
 Config/testthat/edition: 3
 VignetteBuilder: knitr

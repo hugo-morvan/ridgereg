@@ -27,6 +27,7 @@ ridgereg <- setRefClass('ridgereg',
                                       normalized_x_matrix = 'matrix',
                                       y_matrix = 'matrix',
                                       beta_ridge = 'matrix',
+                                      prediction = 'matrix', 
                                       data_name = 'character'),
                         methods = list(
                           initialize = function(formula, data, lambda){
@@ -58,12 +59,11 @@ ridgereg <- setRefClass('ridgereg',
                             colnames(beta_ridge)[1] <<- ""
                             rownames(beta_ridge) <<- ""
                             # Find the predictions
-                            #prediction <<- x_matrix %*% t(beta_ridge)
+                            prediction <<- x_matrix %*% t(beta_ridge)
                             
                             data_name <<-  deparse(substitute(data))
                           },
-                          predict = function(matrix){
-                            prediction <- matrix %*% t(beta_ridge)
+                          predict = function(){
                             return(prediction)
                           },
                           coef = function(){
@@ -76,7 +76,8 @@ ridgereg <- setRefClass('ridgereg',
                             print.default(ridgereg_model$coef())
                           }
                           
-                        ))
+                        )
+)
 
 #ridgereg_model <- ridgereg$new(Petal.Length~Species, iris, 0.001)
 #correct_model <- lm.ridge(Petal.Length~Species, iris)
