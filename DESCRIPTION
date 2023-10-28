@@ -7,6 +7,7 @@ Author: Simge Cinar, Hugo Morvan
 Maintainer: Simge Cinar <simci637@student.liu.se>, Hugo Morvan <hugmo418@student.liu.se>
 Description: This package contains an implementation of a Ridge Regression that copies the functionalities of the MASS::lm.ridge() function.
 License: Apache License (== 2.0) | file LICENSE
+Encoding: UTF-8
 Suggests: 
     knitr,
     rmarkdown,
