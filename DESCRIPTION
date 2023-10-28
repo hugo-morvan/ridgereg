@@ -18,10 +18,13 @@ Imports:
     MASS,
     caret,
     lattice,
+    nycflights13,
+    dplyr,
     methods
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
+VignetteIndexEntry: FlightVignette
 Depends: 
     R (>= 3.5.0)
 RoxygenNote: 7.2.3

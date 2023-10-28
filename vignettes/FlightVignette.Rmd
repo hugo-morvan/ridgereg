@@ -1,0 +1,57 @@
+---
+title: "Flight Vignette"
+author: "Simge Cinar & Hugo Morvan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Flight Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Part 1.1.5
+
+```{r}
+library(dplyr)
+library(ggplot2)
+visualize_airport_delays <- function() {
+  data(flights, package = "nycflights13")
+  data(airports, package = "nycflights13")
+  # Calculate the mean delay for each unique airport
+  airport_delays <- flights %>%
+    group_by(dest) %>%
+    summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
+
+  # Filter out airports that are not in both datasets
+  airport_delays <- airport_delays %>% 
+    filter(dest %in% airports$faa)
+
+  # Add latitude (lat) and longitude (lon) to the airport_delays dataset
+  airport_delays <- airport_delays %>%
+    left_join(airports, by = c("dest" = "faa")) 
+
+  # Create a scatterplot of mean delay by longitude and latitude
+  ggplot(airport_delays, aes(x = lon, y = lat, size = mean_delay)) +
+    geom_point(aes(color = mean_delay)) +
+    scale_size_continuous(range = c(3, 10)) +
+    labs(
+      title = "Mean Flight Delay by Airport Location",
+      x = "Longitude",
+      y = "Latitude",
+      size = "Mean Delay",
+      color = "Mean Delay"
+    ) +
+    theme_minimal()
+}
+
+# Call the function to visualize the airport delays
+visualize_airport_delays()
+```
+
