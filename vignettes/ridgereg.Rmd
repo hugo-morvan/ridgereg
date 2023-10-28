@@ -85,16 +85,25 @@ for (l in lambda){
 
 ```{r}
 library(caret)
-ctrl <- caret::trainControl(method = "cv", number = 10)
+num_folds <- 10
+mse_values <- c()
+folds <- caret::createFolds(training_data$medv, k = num_folds)
+mse_values <- c()
+lambda <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
 
-your_lambda_values <- 10^seq(10, -2, length = 100)
-#your_lambda_values <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
-X <- training_data[,1:13]
-Y <- training_data[,14]
-ridgeGrid <- expand.grid(alpha = 0, lambda = your_lambda_values)
-ridgeModel <- caret::train(X, Y, method = "glmnet", trControl = ctrl, tuneGrid = ridgeGrid)
-bestLambda <- ridgeModel$bestTune$lambda
-cat("\nBest lambda:", bestLambda)
+for (l in lambda){
+  mse_per_lambda <- c()
+  for (i in 1:10){
+    test_fold <- training_data[folds[[i]], ]
+    train_fold <- training_data[-folds[[i]], ]
+
+    ridgereg_model <- ridgereg:::ridgereg$new(medv~., train_fold, l)
+    res <- ridgereg_model$predict(model.matrix(formula,test_fold)) - test_fold[,14]
+    mse_per_lambda <- c(mse_per_lambda, (1/nrow(test_fold))*sum(res^2))
+  }
+  mse_values <- c(mse_values, mean(mse_per_lambda))
+}
+cat("Best lambda is", lambda[which.min(mse_values)], "with", min(mse_values), "MSE")
 ```
 
 
