@@ -76,8 +76,7 @@ ridgereg <- setRefClass('ridgereg',
                             print.default(ridgereg_model$coef())
                           }
                           
-                        )
-)
+                        ))
 
 #ridgereg_model <- ridgereg$new(Petal.Length~Species, iris, 0.001)
 #correct_model <- lm.ridge(Petal.Length~Species, iris)
