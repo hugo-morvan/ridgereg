@@ -16,6 +16,7 @@ Imports:
     ggplot2,
     dplyr,
     MASS,
+    caret,
     methods
 Config/testthat/edition: 3
 VignetteBuilder: knitr

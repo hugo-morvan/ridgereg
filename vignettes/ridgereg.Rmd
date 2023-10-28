@@ -1,0 +1,43 @@
+---
+title: "Ridge Regression Vignette"
+author: "Simge Cinar & Hugo Morvan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ridge Regression Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r library}
+library(ridgereg)
+```
+
+```{r example}
+library(ridgereg)
+ridgereg_model <- ridgereg:::ridgereg$new(Petal.Length~Species, iris, 0.001)
+ridgereg_model$beta_ridge
+```
+
+#QUESTION 1.2
+
+### 1): Create a 70-30 train-test split
+```{r}
+data(Boston, package = "MASS")
+set.seed(123)
+splitIndex <- caret::createDataPartition(Boston$medv, p = 0.7, list = FALSE)
+training_data <- Boston[splitIndex, ]
+test_data <- Boston[-splitIndex, ]
+# Convert columns to numeric
+training_data <- as.data.frame(lapply(training_data, as.numeric))
+test_data <- as.data.frame(lapply(test_data, as.numeric))
+training_data
+```
+
