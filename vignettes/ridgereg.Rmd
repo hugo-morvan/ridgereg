@@ -83,7 +83,19 @@ for (l in lambda){
 
 ### 5) Find the best hyperparameter value for λ using 10-fold cross-validation on the training set.
 
+```{r}
+library(caret)
+ctrl <- caret::trainControl(method = "cv", number = 10)
 
+your_lambda_values <- 10^seq(10, -2, length = 100)
+#your_lambda_values <- c(1000, 100, 10, 1, 10^-2, 10^-4, 10^-6, 10^-10)
+X <- training_data[,1:13]
+Y <- training_data[,14]
+ridgeGrid <- expand.grid(alpha = 0, lambda = your_lambda_values)
+ridgeModel <- caret::train(X, Y, method = "glmnet", trControl = ctrl, tuneGrid = ridgeGrid)
+bestLambda <- ridgeModel$bestTune$lambda
+cat("\nBest lambda:", bestLambda)
+```
 
 
 ### 6) Evaluate the performance of all three models on the test dataset
