@@ -35,11 +35,80 @@ data(weather, package = "nycflights13")
 ```
 
 ```{r}
-head(flights)
+library(dplyr)
+flights <- flights %>%
+  mutate(new_time_origin = paste(origin, year, month, day, hour, sep = "_"))
+flights <- flights[,c("new_time_origin", "arr_delay", "origin", "year", "month")]
+
+weather <- weather %>%
+  mutate(new_time_origin = paste(origin, year, month, day, hour, sep = "_"))
+weather <- weather[,c("new_time_origin", "temp", "humid", "wind_speed", "pressure", "visib")]
+
+merged_data <- flights %>%
+  left_join(weather, by = "new_time_origin")
+
+merged_data <- na.omit(merged_data) # remove the rows that contain NA
 ```
+
 ```{r}
-head(weather)
+head(merged_data)
 ```
+
+### 3) Divide the flight dataset into three sets: test, train and validation (with the proportions 5%, 80% and 15%.
+```{r}
+#library(caret)
+set.seed(42)
+
+# Create an initial split for training (80%) and the remaining data (20%)
+initial_split <- caret::createDataPartition(merged_data$arr_delay, p = 0.8, list = FALSE)
+remaining_data <- merged_data[-initial_split, ]
+
+# Create a second split for validation (15%) from the remaining data
+validation_split <- caret::createDataPartition(remaining_data$arr_delay, p = 0.75, list = FALSE)
+
+train_data <- merged_data[initial_split, ]
+validation_data <- remaining_data[validation_split, ]
+test_data <- remaining_data[-c(validation_split), ]
+
+row.names(train_data) <- NULL
+row.names(validation_data) <- NULL
+row.names(test_data) <- NULL
+
+cat("Number of rows in the train data:", nrow(train_data), "\n")
+cat("Number of rows in the validation data:", nrow(validation_data), "\n")
+cat("Number of rows in the test data:", nrow(test_data), "\n")
+```
+
+### 4) Train ridge regressions models for different values of λ and evaluate the root mean squared error on the validation set. Try to find an optimal value for λ.
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+### 5) When you found a good value for λ, use this to predict the test set and report the RMSE of your predicted model.
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid
+data <- train_data
+
+ridgereg_model <- ridgereg:::ridgereg$new(formula, data, 1000)
+test_mat <- model.matrix(formula, test_data)
+
+res <- ridgereg_model$predict(test_mat) - test_data$arr_delay
+rmse <- sqrt(sum(res^2/nrow(validation_data)))
+rmse
+```
+
 
 
 
