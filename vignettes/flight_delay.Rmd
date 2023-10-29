@@ -20,12 +20,6 @@ knitr::opts_chunk$set(
 library(ridgereg)
 ```
 
-```{r example}
-library(ridgereg)
-ridgereg_model <- ridgereg:::ridgereg$new(Petal.Length~Species, iris, 0.001)
-ridgereg_model$beta_ridge
-```
-
 ## QUESTION 1.2.1:
 
 ### 1) Read in the weather dataset and the flights dataset, remove eventual variables you do not believe to have a predictive value.
@@ -50,9 +44,22 @@ merged_data <- flights %>%
 merged_data <- na.omit(merged_data) # remove the rows that contain NA
 ```
 
+### 2) Add extra weather data from the weather dataset and create interaction effects you think could be of interest for the prediction.
+
+```{r}
+merged_data <- merged_data %>%
+  mutate(temp_month_interaction = temp * month,
+         temp_humid_interaction = temp * humid,
+         temp_wind_interaction = temp * wind_speed,
+         wind_humid_interaction = humid * wind_speed,
+         wind_pressure_interaction = pressure * wind_speed,
+         humid_visib_interaction = humid * visib)
+```
+
 ```{r}
 head(merged_data)
 ```
+
 
 ### 3) Divide the flight dataset into three sets: test, train and validation (with the proportions 5%, 80% and 15%.
 ```{r}
@@ -80,8 +87,10 @@ cat("Number of rows in the test data:", nrow(test_data), "\n")
 ```
 
 ### 4) Train ridge regressions models for different values of λ and evaluate the root mean squared error on the validation set. Try to find an optimal value for λ.
+
+Model 1:
 ```{r}
-formula <- arr_delay ~ temp + wind_speed + humid
+formula <- arr_delay ~ temp + wind_speed
 data <- train_data
 lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
 rmse_val <- c()
@@ -96,17 +105,151 @@ for (l in lambda){
 cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
 ```
 
+Model 2:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid 
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+Model 3:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid + visib
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+Model 4:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid + visib + month + origin
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+Model 5:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid + visib + month + origin + temp_wind_interaction
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+Model 6:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid + visib + month + origin + temp_humid_interaction
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+Model 7:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid + visib + month + origin + wind_humid_interaction
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+Model 8:
+```{r}
+formula <- arr_delay ~ temp + wind_speed + humid + visib + month + origin + temp_wind_interaction + temp_humid_interaction + wind_humid_interaction
+data <- train_data
+lambda <- c(10^6, 10^5, 10^4, 10^3, 10^2, 10^1, 1, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5, 10^-6)
+rmse_val <- c()
+for (l in lambda){
+  ridgereg_model <- ridgereg:::ridgereg$new(formula, data, l)
+  val_mat <- model.matrix(formula, validation_data)
+  res <- ridgereg_model$predict(val_mat) - validation_data$arr_delay
+  rmse <- sqrt(sum(res^2/nrow(validation_data)))
+  rmse_val <- c(rmse_val, rmse)
+}
+
+cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE")
+```
+
+
 ### 5) When you found a good value for λ, use this to predict the test set and report the RMSE of your predicted model.
 ```{r}
-formula <- arr_delay ~ temp + wind_speed + humid
+formula <- arr_delay ~ temp + wind_speed + humid + temp_wind_interaction + temp_humid_interaction + wind_humid_interaction
 data <- train_data
 
-ridgereg_model <- ridgereg:::ridgereg$new(formula, data, 1000)
+ridgereg_model <- ridgereg:::ridgereg$new(formula, data, 100)
 test_mat <- model.matrix(formula, test_data)
 
 res <- ridgereg_model$predict(test_mat) - test_data$arr_delay
-rmse <- sqrt(sum(res^2/nrow(validation_data)))
-rmse
+rmse <- sqrt(sum(res^2/nrow(test_data)))
+cat("RMSE on the test data:", rmse)
+```
+
+```{r}
+library(ggplot2)
+actual_values <- test_data[["arr_delay"]]
+predicted_values <- as.vector(ridgereg_model$predict(test_mat))
+data <- data.frame(Actual = actual_values, Predicted = predicted_values)
+
+# Create a scatterplot
+ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
+  labs(x = "Actual Values", y = "Predicted Values") +
+  ggtitle("Actual vs. Predicted Values")
 ```
 
 

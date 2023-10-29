@@ -20,12 +20,6 @@ knitr::opts_chunk$set(
 library(ridgereg)
 ```
 
-```{r example}
-library(ridgereg)
-ridgereg_model <- ridgereg:::ridgereg$new(Petal.Length~Species, iris, 0.001)
-ridgereg_model$beta_ridge
-```
-
 # QUESTION 1.2
 
 ### 1): Create a 70-30 train-test split
@@ -42,14 +36,12 @@ test_data <- as.data.frame(lapply(test_data, as.numeric))
 
 ### 2,3) Fit a linear regression model and a fit a linear regression model with forward selection of covariates on the training dataset.
 ```{r}
-# KEEP
 # Model1: Full model with the linear regression
 mod1 <- lm(medv ~ ., data=training_data)
 cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((mod1$residuals)^2)))
 ```
 
 ```{r}
-#KEEP
 # Model2: Model with forward selection
 # Selects the model with the lowest AIC
 fullModel <- lm(medv ~ ., data=training_data)
@@ -66,7 +58,6 @@ cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((forward_model$resid
 
 ### 4) Fit a ridge regression model to the training dataset for different values of λ.
 ```{r}
-# KEEP
 # Model3: Ridge regression with full model using different lambda values
 formula <- medv ~ .
 data <- training_data
@@ -82,7 +73,6 @@ for (l in lambda){
 
 
 ### 5) Find the best hyperparameter value for λ using 10-fold cross-validation on the training set.
-
 ```{r}
 library(caret)
 num_folds <- 10
@@ -122,6 +112,20 @@ cat("R-squared:", r_squared)
 ```
 
 ```{r}
+#library(ggplot2)
+actual_values <- test_data[[14]]
+predicted_values <- pred_mod1
+data <- data.frame(Actual = actual_values, Predicted = predicted_values)
+
+# Create a scatterplot
+ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  labs(x = "Actual Values", y = "Predicted Values") +
+  ggtitle("Actual vs. Predicted Values for Model 1")
+```
+
+```{r}
 # Model2: Linear regression with forward selection
 pred_forward_model<- predict(forward_model, newdata = test_data)
 res <- pred_forward_model - test_data[,14]
@@ -133,6 +137,21 @@ ss_residual <- sum(res^2)  # Residual sum of squares
 r_squared <- 1 - (ss_residual / ss_total)
 cat("R-squared:", r_squared)
 ```
+
+```{r}
+#library(ggplot2)
+actual_values <- test_data[[14]]
+predicted_values <- pred_forward_model
+data <- data.frame(Actual = actual_values, Predicted = predicted_values)
+
+# Create a scatterplot
+ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "green", linetype = "dashed") +
+  labs(x = "Actual Values", y = "Predicted Values") +
+  ggtitle("Actual vs. Predicted Values for Model 2")
+```
+
 
 
 ```{r}
@@ -153,6 +172,21 @@ ss_residual <- sum(res^2)  # Residual sum of squares
 r_squared <- 1 - (ss_residual / ss_total)
 cat("R-squared:", r_squared)
 ```
+
+```{r}
+#library(ggplot2)
+actual_values <- test_data[[14]]
+predicted_values <- as.vector(ridgereg_model$predict(test_matrix))
+data <- data.frame(Actual = actual_values, Predicted = predicted_values)
+
+# Create a scatterplot
+ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "orange", linetype = "dashed") +
+  labs(x = "Actual Values", y = "Predicted Values") +
+  ggtitle("Actual vs. Predicted Values for Model 3")
+```
+
 
 ### Conclusion: 
 
