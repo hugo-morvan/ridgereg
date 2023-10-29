@@ -1,0 +1,50 @@
+---
+title: "Flight Delay"
+author: "Simge Cinar & Hugo Morvan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Flight Delay}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r library}
+library(ridgereg)
+```
+
+```{r example}
+library(ridgereg)
+ridgereg_model <- ridgereg:::ridgereg$new(Petal.Length~Species, iris, 0.001)
+ridgereg_model$beta_ridge
+```
+
+## QUESTION 1.2.1:
+
+### 1) Read in the weather dataset and the flights dataset, remove eventual variables you do not believe to have a predictive value.
+```{r}
+data(flights, package = "nycflights13")
+data(weather, package = "nycflights13")
+```
+
+```{r}
+head(flights)
+```
+```{r}
+head(weather)
+```
+
+
+
+
+
+
+
+
