@@ -22,13 +22,18 @@ library(ridgereg)
 
 # QUESTION 1.2
 
+```{r}
+data(BostonHousing, package = "mlbench")
+```
+
 ### 1): Create a 70-30 train-test split
 ```{r}
-data(Boston, package = "MASS")
+#data(Boston, package = "MASS")
+data(BostonHousing, package = "mlbench")
 set.seed(123)
-splitIndex <- caret::createDataPartition(Boston$medv, p = 0.7, list = FALSE)
-training_data <- Boston[splitIndex, ]
-test_data <- Boston[-splitIndex, ]
+splitIndex <- caret::createDataPartition(BostonHousing$medv, p = 0.7, list = FALSE)
+training_data <- BostonHousing[splitIndex, ]
+test_data <- BostonHousing[-splitIndex, ]
 # Convert columns to numeric
 training_data <- as.data.frame(lapply(training_data, as.numeric))
 test_data <- as.data.frame(lapply(test_data, as.numeric))
@@ -52,7 +57,7 @@ forward_model <- MASS::stepAIC(nullModel, # start with a model containing no var
                              lower = nullModel), 
                 trace = 0) # do not show the step-by-step process of model selection
 
-
+forward_model
 cat("Mean Square Error (MSE):",((1/nrow(training_data))*sum((forward_model$residuals)^2)))
 ```
 
@@ -98,8 +103,11 @@ cat("Best lambda is", lambda[which.min(mse_values)], "with", min(mse_values), "M
 
 
 ### 6) Evaluate the performance of all three models on the test dataset
+
+Model 1:
 ```{r}
 # Model1: Linear regression with full model
+cat("Model 1:\n")
 pred_mod1<- predict(mod1, newdata = test_data)
 res <- pred_mod1 - test_data[,14]
 cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
@@ -125,8 +133,10 @@ ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
   ggtitle("Actual vs. Predicted Values for Model 1")
 ```
 
+Model 2:
 ```{r}
 # Model2: Linear regression with forward selection
+cat("Model 2:\n")
 pred_forward_model<- predict(forward_model, newdata = test_data)
 res <- pred_forward_model - test_data[,14]
 cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
@@ -153,8 +163,9 @@ ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
 ```
 
 
-
+Model 3:
 ```{r}
+cat("Model 3:\n")
 # Model3: Ridge regression with full model
 formula <- medv ~ .
 data <- training_data
@@ -187,8 +198,41 @@ ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
   ggtitle("Actual vs. Predicted Values for Model 3")
 ```
 
+```{r}
+cat("Model 4:\n")
+# Model4: Ridge regression with the variables selected from forward selection
+formula <- medv ~ lstat + rm + ptratio + b + dis + nox + chas + rad + tax + crim + zn
+data <- training_data
+lambda <- 0.001
+
+ridgereg_model <- ridgereg:::ridgereg$new(formula, data, lambda)
+test_matrix <- model.matrix(formula,test_data)
+pred <- ridgereg_model$predict(test_matrix)
+res <- pred - test_data[,14]
+cat("Mean Square Error (MSE):", (1/nrow(test_data))*sum(res^2), "\n")
+
+y_actual <- test_data[, 14]  # Assuming the 14th column is the actual target variable
+ss_total <- sum((y_actual - mean(y_actual))^2)  # Total sum of squares
+ss_residual <- sum(res^2)  # Residual sum of squares
+r_squared <- 1 - (ss_residual / ss_total)
+cat("R-squared:", r_squared)
+```
+
+```{r}
+actual_values <- test_data[[14]]
+predicted_values <- as.vector(ridgereg_model$predict(test_matrix))
+data <- data.frame(Actual = actual_values, Predicted = predicted_values)
+
+# Create a scatterplot
+ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "purple", linetype = "dashed") +
+  labs(x = "Actual Values", y = "Predicted Values") +
+  ggtitle("Actual vs. Predicted Values for Model 4")
+```
 
 ### Conclusion: 
+Model 2 & 4 which is gives the best result, their MSE and R^2 values are really close to each other. For model 4; MSE is 25.82156 and R-squared is 0.7199366. Model 2 is the linear regression with forward selection and model 4 is the ridge regression with the same formula obtained in forward selection. We can say that extracting variables "indus" and "age" improved the regression model.
 
 
 

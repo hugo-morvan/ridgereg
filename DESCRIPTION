@@ -20,11 +20,12 @@ Imports:
     lattice,
     nycflights13,
     dplyr,
+    mlbench,
     methods
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
-VignetteIndexEntry: FlightVignette, ridgereg
+VignetteIndexEntry: FlightPlot, ridgereg
 Depends: 
     R (>= 3.5.0)
 RoxygenNote: 7.2.3

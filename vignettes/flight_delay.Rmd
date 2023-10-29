@@ -227,7 +227,7 @@ cat("Best lambda is ", lambda[which.min(rmse_val)], "with", min(rmse_val), "RMSE
 
 ### 5) When you found a good value for λ, use this to predict the test set and report the RMSE of your predicted model.
 ```{r}
-formula <- arr_delay ~ temp + wind_speed + humid + temp_wind_interaction + temp_humid_interaction + wind_humid_interaction
+formula <- arr_delay ~ temp + wind_speed + humid + visib + month + origin + temp_wind_interaction + temp_humid_interaction + wind_humid_interaction
 data <- train_data
 
 ridgereg_model <- ridgereg:::ridgereg$new(formula, data, 100)
@@ -252,7 +252,8 @@ ggplot2::ggplot(data, aes(x = Actual, y = Predicted)) +
   ggtitle("Actual vs. Predicted Values")
 ```
 
-
+### Conclusion: 
+Model 8 gives the best result with RMSE = 41.05442 on the validation data. The RMSE of that model in the test data is 41.7044.
 
 
 
