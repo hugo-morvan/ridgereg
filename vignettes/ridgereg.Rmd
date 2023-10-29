@@ -22,13 +22,8 @@ library(ridgereg)
 
 # QUESTION 1.2
 
-```{r}
-data(BostonHousing, package = "mlbench")
-```
-
 ### 1): Create a 70-30 train-test split
 ```{r}
-#data(Boston, package = "MASS")
 data(BostonHousing, package = "mlbench")
 set.seed(123)
 splitIndex <- caret::createDataPartition(BostonHousing$medv, p = 0.7, list = FALSE)
